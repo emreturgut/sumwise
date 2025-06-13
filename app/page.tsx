@@ -5,8 +5,31 @@ import { Download, LogIn, UserPlus, Sparkles, Zap, Shield, Brain, Badge, Star } 
 import { Button } from '@/components/ui/button'
 import { DynamicBackground } from '@/components/DynamicBackground'
 import Image from 'next/image'
+import { useState, useEffect } from 'react'
 
 export default function Home() {
+    const [currentWordIndex, setCurrentWordIndex] = useState(0)
+    const [displayText, setDisplayText] = useState('')
+    const [isDeleting, setIsDeleting] = useState(false)
+    const words = ['Anything', 'Articles', 'Videos', 'Web Pages', 'Documents']
+
+    useEffect(() => {
+        const currentWord = words[currentWordIndex]
+
+        const timeout = setTimeout(() => {
+            if (!isDeleting && displayText === currentWord) {
+                setTimeout(() => setIsDeleting(true), 1500)
+            } else if (isDeleting && displayText === '') {
+                setIsDeleting(false)
+                setCurrentWordIndex((prev) => (prev + 1) % words.length)
+            } else if (!isDeleting) {
+                setDisplayText(currentWord.substring(0, displayText.length + 1))
+            } else {
+                setDisplayText(currentWord.substring(0, displayText.length - 1))
+            }
+        }, isDeleting ? 50 : 100)
+        return () => clearTimeout(timeout)
+    }, [displayText, isDeleting, currentWordIndex, words])
     return (
         <main className="relative min-h-screen overflow-hidden">
             <DynamicBackground />
@@ -54,7 +77,11 @@ export default function Home() {
                     </div>
                     <h1 className="mb-6 text-5xl font-bold tracking-tight lg:text-7xl">
                         <span className="bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400 bg-clip-text text-transparent">
-                            Summarize Anything
+                            Summarize{' '}
+                            <span className="">
+                                {displayText}
+                                <span className="animate-pulse">|</span>
+                            </span>
                         </span>
                         <br />
                         <span className="text-foreground">In Seconds</span>
