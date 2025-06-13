@@ -1,7 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { Download, LogIn, UserPlus, Sparkles, Zap, Shield, Brain, Badge, Star } from 'lucide-react'
+import { Download, LogIn, UserPlus, Sparkles, Zap, Shield, Brain, Badge, Star, Clock } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { DynamicBackground } from '@/components/DynamicBackground'
 import Image from 'next/image'
@@ -113,22 +113,22 @@ export default function Home() {
                     initial={{ opacity: 0, y: 40 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.6, delay: 0.4 }}
-                    className="mt-24 grid gap-8 sm:grid-cols-2 lg:grid-cols-3"
+                    className="mt-24 grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
                 >
                     <FeatureCard
                         icon={<Zap className="h-6 w-6" />}
                         title="Lightning Fast"
-                        description="Get instant summaries with our advanced AI technology"
+                        description="Get instant summaries of any content with our optimized AI models. No waiting, no delays - just immediate results."
                     />
                     <FeatureCard
-                        icon={<Shield className="h-6 w-6" />}
-                        title="Privacy First"
-                        description="Your data stays secure and private at all times"
+                        icon={<Clock className="h-6 w-6" />}
+                        title="Save Time"
+                        description="Reduce reading time by up to 80%. Focus on what matters most while staying informed about everything else."
                     />
                     <FeatureCard
                         icon={<Sparkles className="h-6 w-6" />}
                         title="Smart Insights"
-                        description="Extract key points and insights automatically"
+                        description="Go beyond basic summaries. Our AI identifies key themes, actionable insights, and hidden patterns to give you deeper understanding of any content."
                     />
                 </motion.div>
             </section>
@@ -144,7 +144,7 @@ function FeatureCard({ icon, title, description }: {
     return (
         <motion.div
             whileHover={{ scale: 1.05 }}
-            className="group relative overflow-hidden rounded-lg border border-border bg-card/50 p-6 backdrop-blur-sm transition-colors hover:border-primary/50"
+            className="w-80 group relative overflow-hidden rounded-lg border border-border bg-card/50 p-6 backdrop-blur-sm transition-colors hover:border-primary/50"
         >
             <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 to-blue-500/10 opacity-0 transition-opacity group-hover:opacity-100" />
             <div className="relative z-10">
