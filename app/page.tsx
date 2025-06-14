@@ -1,7 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { Download, LogIn, UserPlus, Sparkles, Zap, Shield, Brain, Badge, Star, Clock, Quote, Chrome } from 'lucide-react'
+import { Download, LogIn, UserPlus, Sparkles, Zap, Shield, Brain, Badge, Star, Clock, Quote, Chrome, Mail, Linkedin, Twitter, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { DynamicBackground } from '@/components/DynamicBackground'
 import Image from 'next/image'
@@ -252,6 +252,95 @@ export default function Home() {
                     </div>
                 </motion.div>
             </section>
+
+            {/* Footer */}
+            <footer className="relative z-10 bg-gray-900/50 backdrop-blur-sm border-t border-gray-800 mt-20">
+                <div className="max-w-7xl mx-auto px-6 py-12 lg:px-12">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                        {/* Left Section - Logo & Social */}
+                        <div className="space-y-6">
+                            <div className="flex items-center space-x-2">
+                                <div className="relative h-8 w-8">
+                                    <Image src="/icon.svg" alt="Sumwise" fill className="object-contain" />
+                                </div>
+                                <span className="text-2xl font-bold bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
+                                    Sumwise AI
+                                </span>
+                            </div>
+                            <p className="text-muted-foreground max-w-sm">
+                                Transform your content consumption with AI-powered summarization. Save time, stay informed, and focus on what matters most.
+                            </p>
+                            <div className="flex space-x-4">
+                                <a href="#" className="text-muted-foreground hover:text-purple-400 transition-colors">
+                                    <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M20.317 4.492c-1.53-.69-3.17-1.2-4.885-1.49a.075.075 0 0 0-.079.036c-.21.369-.444.85-.608 1.23a18.566 18.566 0 0 0-5.487 0 12.36 12.36 0 0 0-.617-1.23A.077.077 0 0 0 8.562 3c-1.714.29-3.354.8-4.885 1.491a.07.07 0 0 0-.032.027C.533 9.093-.32 13.555.099 17.961a.082.082 0 0 0 .031.056 20.03 20.03 0 0 0 5.993 2.98.078.078 0 0 0 .084-.026 14.23 14.23 0 0 0 1.226-1.963.074.074 0 0 0-.041-.104 13.201 13.201 0 0 1-1.872-.878.075.075 0 0 1-.008-.125c.126-.093.252-.19.372-.287a.075.075 0 0 1 .078-.01c3.927 1.764 8.18 1.764 12.061 0a.075.075 0 0 1 .079.009c.12.098.246.195.372.288a.075.075 0 0 1-.006.125c-.598.344-1.22.635-1.873.877a.075.075 0 0 0-.041.105c.36.687.772 1.341 1.225 1.962a.077.077 0 0 0 .084.028 19.963 19.963 0 0 0 6.002-2.981.076.076 0 0 0 .032-.054c.5-5.094-.838-9.52-3.549-13.442a.06.06 0 0 0-.031-.028zM8.02 15.278c-1.182 0-2.157-1.069-2.157-2.38 0-1.312.956-2.38 2.157-2.38 1.21 0 2.176 1.077 2.157 2.38 0 1.312-.956 2.38-2.157 2.38zm7.975 0c-1.183 0-2.157-1.069-2.157-2.38 0-1.312.955-2.38 2.157-2.38 1.21 0 2.176 1.077 2.157 2.38 0 1.312-.946 2.38-2.157 2.38z" />
+                                    </svg>
+                                </a>
+                                <a href="#" className="text-muted-foreground hover:text-purple-400 transition-colors">
+                                    <X className="h-6 w-6" />
+                                </a>
+                                <a href="#" className="text-muted-foreground hover:text-purple-400 transition-colors">
+                                    <Linkedin className="h-6 w-6" />
+                                </a>
+                                <a href="#" className="text-muted-foreground hover:text-purple-400 transition-colors">
+                                    <Mail className="h-6 w-6" />
+                                </a>
+                            </div>
+                        </div>
+
+                        {/* Middle Section - Product */}
+                        <div>
+                            <h3 className="text-lg font-semibold text-foreground mb-4">Product</h3>
+                            <ul className="space-y-3">
+                                <li>
+                                    <a href="#" className="text-muted-foreground hover:text-purple-400 transition-colors">
+                                        Features
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="#" className="text-muted-foreground hover:text-purple-400 transition-colors">
+                                        Pricing
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="#" className="text-muted-foreground hover:text-purple-400 transition-colors">
+                                        Blog
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+
+                        {/* Right Section - Support */}
+                        <div>
+                            <h3 className="text-lg font-semibold text-foreground mb-4">Support</h3>
+                            <ul className="space-y-3">
+                                <li>
+                                    <a href="#" className="text-muted-foreground hover:text-purple-400 transition-colors">
+                                        Contact Us
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="#" className="text-muted-foreground hover:text-purple-400 transition-colors">
+                                        Privacy Policy
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="#" className="text-muted-foreground hover:text-purple-400 transition-colors">
+                                        Terms of Service
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    {/* Bottom Section - Copyright */}
+                    <div className="border-t border-gray-800 mt-8 pt-8 text-center">
+                        <p className="text-muted-foreground">
+                            © 2025 Sumwise AI. All rights reserved.
+                        </p>
+                    </div>
+                </div>
+            </footer>
         </main>
     )
 }
