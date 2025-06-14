@@ -108,12 +108,29 @@ export default function Home() {
                     </motion.div>
                 </motion.div>
 
+                {/* Why Choose Section */}
+                <motion.div
+                    initial={{ opacity: 0, y: 30 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.6, delay: 0.3 }}
+                    className="mt-20 text-center"
+                >
+                    <h2 className="mb-4 text-3xl font-bold lg:text-4xl">
+                        <span className="bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
+                            Why Choose Sumwise AI?
+                        </span>
+                    </h2>
+                    <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+                        Experience the future of content consumption with our intelligent summarization technology designed for the modern digital world.
+                    </p>
+                </motion.div>
+
                 {/* Features */}
                 <motion.div
                     initial={{ opacity: 0, y: 40 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.6, delay: 0.4 }}
-                    className="mt-24 grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
+                    transition={{ duration: 0.6, delay: 0.5 }}
+                    className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
                 >
                     <FeatureCard
                         icon={<Zap className="h-6 w-6" />}
