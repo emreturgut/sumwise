@@ -1,7 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { Download, LogIn, UserPlus, Sparkles, Zap, Shield, Brain, Badge, Star, Clock, Quote } from 'lucide-react'
+import { Download, LogIn, UserPlus, Sparkles, Zap, Shield, Brain, Badge, Star, Clock, Quote, Chrome } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { DynamicBackground } from '@/components/DynamicBackground'
 import Image from 'next/image'
@@ -189,6 +189,38 @@ export default function Home() {
                             role="Financial Institution"
                             company="Financial Institution"
                         />
+                    </div>
+                </motion.div>
+
+                {/* Browser Extension Section */}
+                <motion.div
+                    initial={{ opacity: 0, y: 40 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.6, delay: 0.8 }}
+                    className="mt-20 text-center"
+                >
+                    <h2 className="mb-4 text-3xl font-bold lg:text-4xl">
+                        <span className="bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
+                            Get the Browser Extension
+                        </span>
+                    </h2>
+                    <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-8">
+                        Install Sumwise directly in your browser and summarize any webpage with just one click. Available now for Chrome, with more browsers coming soon.
+                    </p>
+
+                    <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
+                        <Button size="lg" className="group w-64">
+                            <Chrome className="mr-2 h-5 w-5" />
+                            Add to Chrome
+                            <Download className="ml-2 h-4 w-4 transition-transform group-hover:-translate-y-1" />
+                        </Button>
+                        <Button size="lg" variant="outline" disabled className="w-64 opacity-50 cursor-not-allowed">
+                            <svg className="mr-2 h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm0 22C6.486 22 2 17.514 2 12S6.486 2 12 2s10 4.486 10 10-4.486 10-10 10z" />
+                                <path d="M12 6c-3.314 0-6 2.686-6 6s2.686 6 6 6 6-2.686 6-6-2.686-6-6-6zm0 10c-2.209 0-4-1.791-4-4s1.791-4 4-4 4 1.791 4 4-1.791 4-4 4z" />
+                            </svg>
+                            Firefox - Coming Soon
+                        </Button>
                     </div>
                 </motion.div>
             </section>
