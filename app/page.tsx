@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import { DynamicBackground } from '@/components/DynamicBackground'
 import Image from 'next/image'
 import { useState, useEffect } from 'react'
+import FeaturesAnimation from '@/components/features-animation'
 
 export default function Home() {
     const [currentWordIndex, setCurrentWordIndex] = useState(0)
@@ -148,6 +149,8 @@ export default function Home() {
                         description="Go beyond basic summaries. Our AI identifies key themes, actionable insights, and hidden patterns to give you deeper understanding of any content."
                     />
                 </motion.div>
+
+                <FeaturesAnimation />
             </section>
         </main>
     )
