@@ -223,6 +223,34 @@ export default function Home() {
                         </Button>
                     </div>
                 </motion.div>
+
+                {/* Ready to Transform Section */}
+                <motion.div
+                    initial={{ opacity: 0, y: 40 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.6, delay: 0.9 }}
+                    className="mt-20 text-center bg-gradient-to-r from-purple-500/10 to-blue-500/10 rounded-2xl p-8 border border-purple-300/20"
+                >
+                    <h2 className="mb-4 text-3xl font-bold lg:text-4xl">
+                        <span className="bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
+                            Ready to Transform Your Content Experience?
+                        </span>
+                    </h2>
+                    <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-8">
+                        Join thousands of professionals who save hours every day with intelligent AI summarization. Start your journey to more efficient content consumption today.
+                    </p>
+
+                    <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
+                        <Button size="lg" className="group w-48">
+                            <Star className="mr-2 h-5 w-5" />
+                            Start Free Trial
+                        </Button>
+                        <Button size="lg" variant="outline" className="w-48">
+                            <LogIn className="mr-2 h-5 w-5" />
+                            Sign In
+                        </Button>
+                    </div>
+                </motion.div>
             </section>
         </main>
     )
