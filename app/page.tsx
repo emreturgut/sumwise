@@ -1,7 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { Download, LogIn, UserPlus, Sparkles, Zap, Shield, Brain, Badge, Star, Clock } from 'lucide-react'
+import { Download, LogIn, UserPlus, Sparkles, Zap, Shield, Brain, Badge, Star, Clock, Quote } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { DynamicBackground } from '@/components/DynamicBackground'
 import Image from 'next/image'
@@ -151,6 +151,46 @@ export default function Home() {
                 </motion.div>
 
                 <FeaturesAnimation />
+
+                {/* Testimonials Section */}
+                <motion.div
+                    initial={{ opacity: 0, y: 40 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.6, delay: 0.7 }}
+                    className="mt-20"
+                >
+                    <div className="text-center mb-12">
+                        <h2 className="mb-4 text-3xl font-bold lg:text-4xl">
+                            <span className="bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
+                                What Our Users Say
+                            </span>
+                        </h2>
+                        <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+                            Join thousands of professionals who have transformed their reading experience with Sumwise AI.
+                        </p>
+                    </div>
+
+                    <div className="grid gap-6 sm:grid-cols-1 lg:grid-cols-3 max-w-6xl mx-auto">
+                        <TestimonialCard
+                            quote="I no longer spend hours reading code documentation and technical articles. I can capture the main points in minutes and focus on actual coding."
+                            author="Senior Software Developer"
+                            role="Tech Company"
+                            company="Tech Company"
+                        />
+                        <TestimonialCard
+                            quote="Creating marketing strategies requires reading tons of articles and reports. With Sumwise, I can quickly extract trend analysis and key insights for campaigns."
+                            author="Marketing Specialist"
+                            role="Digital Agency"
+                            company="Digital Agency"
+                        />
+                        <TestimonialCard
+                            quote="My research projects require scanning dozens of sources. This tool helps me quickly grasp the essence of each source and focus on my actual work."
+                            author="Business Analyst"
+                            role="Financial Institution"
+                            company="Financial Institution"
+                        />
+                    </div>
+                </motion.div>
             </section>
         </main>
     )
@@ -173,6 +213,37 @@ function FeatureCard({ icon, title, description }: {
                 </div>
                 <h3 className="mb-2 text-lg font-semibold">{title}</h3>
                 <p className="text-sm text-muted-foreground">{description}</p>
+            </div>
+        </motion.div>
+    )
+}
+
+function TestimonialCard({ quote, author, role, company }: {
+    quote: string
+    author: string
+    role: string
+    company: string
+}) {
+    return (
+        <motion.div
+            whileHover={{ scale: 1.02 }}
+            className="group relative overflow-hidden rounded-lg border border-border bg-card/50 p-6 backdrop-blur-sm transition-colors hover:border-primary/50"
+        >
+            <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-blue-500/5 opacity-0 transition-opacity group-hover:opacity-100" />
+            <div className="relative z-10">
+                <Quote className="h-8 w-8 text-primary/60 mb-4" />
+                <p className="text-foreground mb-6 italic leading-relaxed">
+                    "{quote}"
+                </p>
+                <div className="flex items-center">
+                    <div className="w-10 h-10 rounded-full bg-gradient-to-r from-purple-400 to-blue-400 flex items-center justify-center text-white font-semibold mr-3">
+                        {author[0]}
+                    </div>
+                    <div>
+                        <p className="font-semibold text-foreground">{author}</p>
+                        <p className="text-sm text-muted-foreground">{role}</p>
+                    </div>
+                </div>
             </div>
         </motion.div>
     )
