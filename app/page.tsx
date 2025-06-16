@@ -105,9 +105,11 @@ export default function Home() {
                             <Download className="mr-2 h-5 w-5 transition-transform group-hover:-translate-y-1" />
                             Download Extension
                         </Button>
-                        <Button size="lg" variant="outline">
-                            Get Started Free
-                        </Button>
+                        <Link href="/signup">
+                            <Button size="lg" variant="outline">
+                                Get Started Free
+                            </Button>
+                        </Link>
                     </motion.div>
                 </motion.div>
 
@@ -243,10 +245,12 @@ export default function Home() {
                     </p>
 
                     <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
-                        <Button size="lg" className="group w-48">
-                            <Star className="mr-2 h-5 w-5" />
-                            Start Free Trial
-                        </Button>
+                        <Link href="/signup">
+                            <Button size="lg" className="group w-48">
+                                <Star className="mr-2 h-5 w-5" />
+                                Start Free Trial
+                            </Button>
+                        </Link>
                         <Link href="/signin">
                             <Button size="lg" variant="outline" className="w-48">
                                 Sign In
