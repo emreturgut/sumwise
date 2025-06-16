@@ -1,0 +1,122 @@
+'use client'
+
+import { motion } from 'framer-motion'
+import { LogIn, Mail, Lock, ArrowLeft } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { DynamicBackground } from '@/components/DynamicBackground'
+import Image from 'next/image'
+import Link from 'next/link'
+
+export default function SignIn() {
+    return (
+        <main className="relative min-h-screen overflow-hidden">
+            <DynamicBackground />
+
+            {/* Navigation */}
+            <nav className="relative z-10 flex items-center justify-between px-6 py-4 lg:px-12">
+                <motion.div
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.5 }}
+                    className="flex items-center space-x-2"
+                >
+                    <div className="relative h-8 w-8">
+                        <Image src="/icon.svg" alt="Sumwise" fill className="object-contain" />
+                    </div>
+                    <span className="text-2xl font-bold bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
+                        Sumwise
+                    </span>
+                </motion.div>
+            </nav>
+
+            {/* Sign In Form */}
+            <section className="relative z-10 flex flex-col items-center justify-center px-6 py-24 text-center lg:px-12">
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.6 }}
+                    className="w-full max-w-md"
+                >
+                    <div className="bg-card/50 backdrop-blur-sm border border-border rounded-2xl p-8">
+                        <div className="mb-8">
+                            <h1 className="mb-2 text-3xl font-bold">
+                                <span className="bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
+                                    Welcome Back
+                                </span>
+                            </h1>
+                            <p className="text-muted-foreground">
+                                Sign in to your Sumwise account
+                            </p>
+                        </div>
+
+                        <form className="space-y-6">
+                            <div className="space-y-2">
+                                <label htmlFor="email" className="text-sm font-medium text-left block">
+                                    Email
+                                </label>
+                                <div className="relative">
+                                    <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                                    <input
+                                        id="email"
+                                        type="email"
+                                        placeholder="Enter your email"
+                                        className="w-full pl-10 pr-4 py-3 bg-background/50 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent transition-colors"
+                                        required
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="space-y-2">
+                                <label htmlFor="password" className="text-sm font-medium text-left block">
+                                    Password
+                                </label>
+                                <div className="relative">
+                                    <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                                    <input
+                                        id="password"
+                                        type="password"
+                                        placeholder="Enter your password"
+                                        className="w-full pl-10 pr-4 py-3 bg-background/50 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent transition-colors"
+                                        required
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="flex items-center justify-between text-sm">
+                                <label className="flex items-center space-x-2">
+                                    <input
+                                        type="checkbox"
+                                        className="w-4 h-4 rounded border-border text-purple-400 focus:ring-purple-400"
+                                    />
+                                    <span className="text-muted-foreground">Remember me</span>
+                                </label>
+                                <a href="#" className="text-purple-400 hover:text-purple-300 transition-colors">
+                                    Forgot password?
+                                </a>
+                            </div>
+
+                            <Button type="submit" size="lg" className="w-full group">
+                                <LogIn className="mr-2 h-5 w-5" />
+                                Sign In
+                            </Button>
+                        </form>
+
+                        <div className="mt-6 text-center">
+                            <p className="text-muted-foreground">
+                                Don't have an account?{' '}
+                                <a href="#" className="text-purple-400 hover:text-purple-300 transition-colors font-medium">
+                                    Sign up for free
+                                </a>
+                            </p>
+                        </div>
+                    </div>
+                    <Link href="/" className="flex items-center space-x-2 group mt-4">
+                        <ArrowLeft className="h-5 w-5 text-muted-foreground group-hover:text-purple-400 transition-colors" />
+                        <span className="text-muted-foreground group-hover:text-purple-400 transition-colors">Back to Home</span>
+                    </Link>
+
+                </motion.div>
+            </section>
+        </main>
+    )
+} 

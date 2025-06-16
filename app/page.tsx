@@ -7,6 +7,7 @@ import { DynamicBackground } from '@/components/DynamicBackground'
 import Image from 'next/image'
 import { useState, useEffect } from 'react'
 import FeaturesAnimation from '@/components/features-animation'
+import Link from 'next/link'
 
 export default function Home() {
     const [currentWordIndex, setCurrentWordIndex] = useState(0)
@@ -57,10 +58,11 @@ export default function Home() {
                     transition={{ duration: 0.5 }}
                     className="flex items-center space-x-4"
                 >
-                    <Button variant="ghost" size="sm">
-                        <LogIn className="mr-2 h-4 w-4" />
-                        Sign In
-                    </Button>
+                    <Link href="/signin">
+                        <Button variant="ghost" size="sm">
+                            Sign In
+                        </Button>
+                    </Link>
                 </motion.div>
             </nav>
 
@@ -245,10 +247,11 @@ export default function Home() {
                             <Star className="mr-2 h-5 w-5" />
                             Start Free Trial
                         </Button>
-                        <Button size="lg" variant="outline" className="w-48">
-                            <LogIn className="mr-2 h-5 w-5" />
-                            Sign In
-                        </Button>
+                        <Link href="/signin">
+                            <Button size="lg" variant="outline" className="w-48">
+                                Sign In
+                            </Button>
+                        </Link>
                     </div>
                 </motion.div>
             </section>
