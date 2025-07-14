@@ -1,7 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { signUpUser } from '@/lib/auth'
+import { testConnection } from '@/lib/database'
 
 export async function POST(request: NextRequest) {
     try {
+        // Test database connection first
+        const dbConnected = await testConnection()
+        if (!dbConnected) {
+            return NextResponse.json(
+                { error: 'Database connection failed. Please ensure PostgreSQL is running.' },
+                { status: 503 }
+            )
+        }
+
         const body = await request.json()
         const { email, password, confirmPassword } = body
 
@@ -38,35 +49,27 @@ export async function POST(request: NextRequest) {
             )
         }
 
-        // TODO: Check if user already exists
-        // TODO: Hash password before storing
-        // TODO: Store user in database
-
-        // Simulate user already exists check
-        if (email === 'existing@sumwise.ai') {
-            return NextResponse.json(
-                { error: 'User with this email already exists' },
-                { status: 409 }
-            )
-        }
-
-        // Simulate successful registration
-        const newUser = {
-            id: 'user-' + Date.now(),
-            email: email,
-            name: email.split('@')[0],
-            createdAt: new Date().toISOString()
-        }
+        // Create user account
+        const result = await signUpUser(email, password)
 
         return NextResponse.json({
             success: true,
             message: 'Account created successfully',
-            user: newUser,
-            token: 'demo-jwt-token-' + Date.now()
+            user: result.user,
+            token: result.token
         }, { status: 201 })
 
-    } catch (error) {
+    } catch (error: any) {
         console.error('Sign up error:', error)
+
+        // Handle specific signup errors
+        if (error.message === 'User with this email already exists') {
+            return NextResponse.json(
+                { error: error.message },
+                { status: 409 }
+            )
+        }
+
         return NextResponse.json(
             { error: 'Internal server error' },
             { status: 500 }

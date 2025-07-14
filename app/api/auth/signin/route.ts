@@ -1,7 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { signInUser } from '@/lib/auth'
+import { testConnection } from '@/lib/database'
 
 export async function POST(request: NextRequest) {
     try {
+        // Test database connection first
+        const dbConnected = await testConnection()
+        if (!dbConnected) {
+            return NextResponse.json(
+                { error: 'Database connection failed. Please ensure PostgreSQL is running.' },
+                { status: 503 }
+            )
+        }
+
         const body = await request.json()
         const { email, password } = body
 
@@ -22,29 +33,31 @@ export async function POST(request: NextRequest) {
             )
         }
 
-        // TODO: Implement actual authentication logic
-        // For now, we'll simulate a successful login
-        if (email === 'demo@sumwise.ai' && password === 'demo123') {
-            return NextResponse.json({
-                success: true,
-                message: 'Login successful',
-                user: {
-                    id: '1',
-                    email: email,
-                    name: 'Demo User'
-                },
-                token: 'demo-jwt-token-' + Date.now()
-            })
+        // Get client IP and User-Agent for session tracking
+        const ipAddress = request.ip || request.headers.get('x-forwarded-for') || 'unknown'
+        const userAgent = request.headers.get('user-agent') || 'unknown'
+
+        // Authenticate user
+        const result = await signInUser(email, password, ipAddress, userAgent)
+
+        return NextResponse.json({
+            success: true,
+            message: 'Login successful',
+            user: result.user,
+            token: result.token
+        })
+
+    } catch (error: any) {
+        console.error('Sign in error:', error)
+
+        // Handle specific authentication errors
+        if (error.message === 'Invalid email or password' || error.message === 'Account is deactivated') {
+            return NextResponse.json(
+                { error: error.message },
+                { status: 401 }
+            )
         }
 
-        // Simulate authentication failure
-        return NextResponse.json(
-            { error: 'Invalid email or password' },
-            { status: 401 }
-        )
-
-    } catch (error) {
-        console.error('Sign in error:', error)
         return NextResponse.json(
             { error: 'Internal server error' },
             { status: 500 }
