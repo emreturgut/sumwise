@@ -106,6 +106,69 @@ Register a new user account.
 
 ---
 
+### Text Summarization
+
+#### POST /api/summarize
+Summarize text using AWS Bedrock with Mistral Pixtral Large model.
+
+**Request Body:**
+```json
+{
+  "text": "Your long text to summarize here...",
+  "language": "tr",
+  "summary_length": "medium",
+  "bullet_points": false,
+  "custom_prompt": "Optional custom prompt"
+}
+```
+
+**Request Parameters:**
+- `text` (required): The text to summarize (minimum 100 characters)
+- `language` (optional): Language code (`tr`, `en`, etc.) - auto-detected if not provided
+- `summary_length` (optional): Length of summary - `short`, `medium` (default), or `long`
+- `bullet_points` (optional): Return summary as bullet points (default: `false`)
+- `custom_prompt` (optional): Custom prompt for summarization
+
+**Success Response (200):**
+```json
+{
+  "summary": "Your summarized text here...",
+  "original_length": 1500,
+  "summary_length": 250,
+  "detected_language": "tr",
+  "processing_time": 3.45,
+  "model_used": "eu.mistral.pixtral-large-2502-v1:0",
+  "chunks_processed": 1
+}
+```
+
+**Error Responses:**
+- `400`: Text too short (minimum 100 characters)
+- `500`: Summarization failed or Bedrock service unavailable
+
+**Features:**
+- Automatically chunks long texts for processing
+- Supports Turkish, English, and other languages
+- Customizable summary length and format
+- Smart paragraph and sentence-based chunking
+- Multiple chunks are summarized and then combined into a final summary
+
+#### GET /api/summarize
+Health check for the summarization service.
+
+**Response:**
+```json
+{
+  "status": "healthy",
+  "service": "Sumwise Text Summarization",
+  "bedrock_available": true,
+  "model_id": "eu.mistral.pixtral-large-2502-v1:0",
+  "region": "eu-central-1"
+}
+```
+
+---
+
 ### Test Endpoints
 
 #### GET /api/test
@@ -169,6 +232,30 @@ curl -X POST http://localhost:3000/api/auth/signin \
 curl -X POST http://localhost:3000/api/auth/signup \
   -H "Content-Type: application/json" \
   -d '{"email":"test@example.com","password":"test123","confirmPassword":"test123"}'
+```
+
+**Summarize Text:**
+```bash
+# Basic summarization
+curl -X POST http://localhost:3000/api/summarize \
+  -H "Content-Type: application/json" \
+  -d '{
+    "text": "Your long text here... (minimum 100 characters)",
+    "summary_length": "medium"
+  }'
+
+# With all options
+curl -X POST http://localhost:3000/api/summarize \
+  -H "Content-Type: application/json" \
+  -d '{
+    "text": "Your long text here...",
+    "language": "tr",
+    "summary_length": "short",
+    "bullet_points": true
+  }'
+
+# Check summarization service health
+curl http://localhost:3000/api/summarize
 ```
 
 **Test Endpoint:**

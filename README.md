@@ -4,7 +4,10 @@ Sumwise is an AI-powered content summarization platform that helps users quickly
 
 ## Features
 
-- 🤖 AI-powered content summarization
+- 🤖 **AI-powered text summarization** using AWS Bedrock with Mistral Pixtral Large
+- 🌍 Multi-language support (Turkish, English, and more)
+- 📝 Smart text chunking for long documents
+- ⚙️ Customizable summary length and format
 - 📊 Interactive dashboard with animated features
 - 🔐 User authentication and session management  
 - 📱 Responsive design with modern UI
@@ -17,6 +20,7 @@ Sumwise is an AI-powered content summarization platform that helps users quickly
 - **Frontend**: Next.js 14, React 18, TypeScript
 - **Styling**: Tailwind CSS, Framer Motion
 - **Backend**: Next.js API Routes
+- **AI/ML**: AWS Bedrock with Mistral Pixtral Large
 - **Database**: PostgreSQL with Docker
 - **Authentication**: JWT with bcrypt
 - **UI Components**: Radix UI, Lucide Icons
@@ -58,7 +62,18 @@ npm run docker:up
 # - pgAdmin on port 5050
 ```
 
-### 4. Start the Development Server
+### 4. Configure AWS Bedrock (for AI Summarization)
+
+```bash
+# Add to your .env.local file:
+AWS_REGION=eu-central-1
+AWS_ACCESS_KEY_ID=your-aws-access-key
+AWS_SECRET_ACCESS_KEY=your-aws-secret-key
+```
+
+See [SETUP_AWS_BEDROCK.md](./SETUP_AWS_BEDROCK.md) for detailed AWS setup instructions.
+
+### 5. Start the Development Server
 
 ```bash
 npm run dev
@@ -98,9 +113,23 @@ Password: demo123
 ### Available Endpoints
 
 - `GET /api/health` - Health check with database status
+- `POST /api/summarize` - AI-powered text summarization
+- `GET /api/summarize` - Summarization service health check
 - `POST /api/auth/signin` - User authentication
 - `POST /api/auth/signup` - User registration
 - `GET/POST /api/test` - Test endpoints
+
+**Example Summarization Request:**
+
+```bash
+curl -X POST http://localhost:3000/api/summarize \
+  -H "Content-Type: application/json" \
+  -d '{
+    "text": "Your long text here...",
+    "summary_length": "medium",
+    "language": "tr"
+  }'
+```
 
 ### Interactive Testing
 
@@ -144,6 +173,11 @@ Required variables in `.env.local`:
 DATABASE_URL="postgresql://sumwise_user:sumwise_password@localhost:5432/sumwise_db"
 JWT_SECRET=your-super-secret-jwt-key
 NODE_ENV=development
+
+# AWS Bedrock (for AI summarization)
+AWS_REGION=eu-central-1
+AWS_ACCESS_KEY_ID=your-aws-access-key
+AWS_SECRET_ACCESS_KEY=your-aws-secret-key
 ```
 
 ### Available Scripts
@@ -245,6 +279,8 @@ NODE_ENV="production"
 ### Getting Help
 
 - Check [SETUP_POSTGRESQL.md](./SETUP_POSTGRESQL.md) for database issues
+- Check [SETUP_AWS_BEDROCK.md](./SETUP_AWS_BEDROCK.md) for AWS Bedrock configuration
+- Check [API_DOCS.md](./API_DOCS.md) for complete API documentation
 - View logs: `npm run docker:logs`
 - Reset everything: `npm run db:reset`
 
