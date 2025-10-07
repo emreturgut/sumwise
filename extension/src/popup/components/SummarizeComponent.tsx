@@ -86,6 +86,7 @@ function extractTextFromStructNode(node: any): string {
 const SummarizeComponent: React.FC<SummarizeComponentProps> = ({ onBackToSettings, selectedModel: initialModel }) => {
     const [isLoading, setIsLoading] = useState(false);
     const [selectedModel, setSelectedModel] = useState(initialModel || 'o4-mini');
+    const [aiProvider, setAiProvider] = useState('openai');
     const [contentType, setContentType] = useState<ContentType>('webpage');
     const [pdfFile, setPdfFile] = useState<File | null>(null);
     const [youtubeUrl, setYoutubeUrl] = useState('');
@@ -101,6 +102,12 @@ const SummarizeComponent: React.FC<SummarizeComponentProps> = ({ onBackToSetting
 
     useEffect(() => {
         getCurrentTab();
+        // Load AI provider
+        chrome.storage.local.get(['aiProvider'], (result) => {
+            if (result.aiProvider) {
+                setAiProvider(result.aiProvider);
+            }
+        });
     }, []);
 
     const getCurrentTab = async () => {
@@ -422,10 +429,69 @@ const SummarizeComponent: React.FC<SummarizeComponentProps> = ({ onBackToSetting
         });
     };
 
-    const summarizeWithAI = async (content: string, maxCharacters: number, targetLanguage: string): Promise<string> => {
-        const result = await chrome.storage.local.get(['apiKey']);
-        const apiKey = result.apiKey;
+    const summarizeWithSumwise = async (content: string, maxCharacters: number, targetLanguage: string, apiUrl: string): Promise<string> => {
+        try {
+            // Prepare summary length based on character limit
+            let summaryLength: 'short' | 'medium' | 'long' = 'medium';
+            if (maxCharacters > 0) {
+                if (maxCharacters <= 300) {
+                    summaryLength = 'short';
+                } else if (maxCharacters >= 600) {
+                    summaryLength = 'long';
+                }
+            }
 
+            // Map target language
+            const language = targetLanguage === 'auto' ? undefined : targetLanguage;
+
+            console.log('Calling Sumwise API:', apiUrl);
+            console.log('Content length:', content.length);
+            console.log('Summary length:', summaryLength);
+            console.log('Language:', language);
+
+            const response = await fetch(apiUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    text: content,
+                    language: language,
+                    summary_length: summaryLength,
+                    bullet_points: false
+                })
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(`Sumwise API Error: ${errorData.error || response.statusText}`);
+            }
+
+            const data = await response.json();
+            console.log('Sumwise API response:', data);
+
+            return data.summary;
+        } catch (error) {
+            console.error('Sumwise API error:', error);
+            if (error instanceof TypeError && error.message.includes('fetch')) {
+                throw new Error('Failed to connect to Sumwise API. Make sure the server is running on ' + apiUrl);
+            }
+            throw new Error(`Failed to generate summary with Sumwise: ${error instanceof Error ? error.message : 'Unknown error'}`);
+        }
+    };
+
+    const summarizeWithAI = async (content: string, maxCharacters: number, targetLanguage: string): Promise<string> => {
+        const result = await chrome.storage.local.get(['aiProvider', 'apiKey', 'apiUrl']);
+        const aiProvider = result.aiProvider || 'openai';
+        const apiKey = result.apiKey;
+        const apiUrl = result.apiUrl || 'http://localhost:3000/api/summarize';
+
+        // Route to the correct provider
+        if (aiProvider === 'sumwise') {
+            return await summarizeWithSumwise(content, maxCharacters, targetLanguage, apiUrl);
+        }
+
+        // Default to OpenAI
         if (!apiKey) {
             throw new Error('API key not found. Please set it in the settings.');
         }
@@ -512,22 +578,34 @@ const SummarizeComponent: React.FC<SummarizeComponentProps> = ({ onBackToSetting
                 </button>
             </header>
 
-            <div className="model-selection">
-                <label htmlFor="model-select">Model:</label>
-                <select
-                    id="model-select"
-                    value={selectedModel}
-                    onChange={handleModelChange}
-                    className="model-select"
-                >
-                    <option value="gpt-4.1">GPT-4.1</option>
-                    <option value="o4-mini">O4 Mini</option>
-                    <option value="o3">O3</option>
-                    <option value="gpt-4o">GPT-4o</option>
-                    <option value="gpt-4o-mini">GPT-4o Mini</option>
-                    <option value="gpt-4-turbo">GPT-4 Turbo</option>
-                </select>
+            <div className="provider-info" style={{ 
+                padding: '10px', 
+                background: aiProvider === 'sumwise' ? '#e8f5e9' : '#e3f2fd', 
+                borderRadius: '5px', 
+                marginBottom: '15px',
+                fontSize: '13px'
+            }}>
+                <strong>Provider:</strong> {aiProvider === 'sumwise' ? '🚀 Sumwise API (AWS Bedrock + Mistral)' : '🤖 OpenAI'}
             </div>
+
+            {aiProvider === 'openai' && (
+                <div className="model-selection">
+                    <label htmlFor="model-select">Model:</label>
+                    <select
+                        id="model-select"
+                        value={selectedModel}
+                        onChange={handleModelChange}
+                        className="model-select"
+                    >
+                        <option value="gpt-4.1">GPT-4.1</option>
+                        <option value="o4-mini">O4 Mini</option>
+                        <option value="o3">O3</option>
+                        <option value="gpt-4o">GPT-4o</option>
+                        <option value="gpt-4o-mini">GPT-4o Mini</option>
+                        <option value="gpt-4-turbo">GPT-4 Turbo</option>
+                    </select>
+                </div>
+            )}
 
             <div className="content-type-selection">
                 <label htmlFor="content-type">Content Type:</label>
