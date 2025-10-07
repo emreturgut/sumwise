@@ -1,0 +1,44 @@
+{
+    "manifest_version": 3,
+    "name": "AI Summarizer",
+    "description": "Summarize web pages, PDFs, and YouTube videos using AI",
+    "version": "1.0.0",
+    "action": {
+        "default_popup": "index.html",
+        "default_title": "AI Summarizer"
+    },
+    "permissions": [
+        "storage",
+        "activeTab",
+        "scripting",
+        "webRequest"
+    ],
+    "host_permissions": [
+        "https://api.openai.com/*",
+        "<all_urls>"
+    ],
+    "web_accessible_resources": [
+        {
+            "resources": [
+                "js/pdf.worker.min.js"
+            ],
+            "matches": [
+                "<all_urls>"
+            ]
+        }
+    ],
+    "background": {
+        "service_worker": "src/background/index.ts",
+        "type": "module"
+    },
+    "content_scripts": [
+        {
+            "matches": [
+                "<all_urls>"
+            ],
+            "js": [
+                "src/contentScript/index.tsx"
+            ]
+        }
+    ]
+}
