@@ -176,6 +176,86 @@ Health check for the summarization service.
 
 ---
 
+### YouTube Video Summarization
+
+#### POST /api/summarize/youtube
+Summarize YouTube videos by extracting and summarizing their transcripts.
+
+**Request Body:**
+```json
+{
+  "url": "https://www.youtube.com/watch?v=VIDEO_ID",
+  "language": "tr",
+  "summary_length": "medium",
+  "bullet_points": false,
+  "custom_prompt": "Optional custom prompt"
+}
+```
+
+**Request Parameters:**
+- `url` (required): YouTube video URL (supports youtube.com/watch, youtu.be, youtube.com/embed)
+- `language` (optional): Target summary language - auto-detected if not provided
+- `summary_length` (optional): Length of summary - `short`, `medium` (default), or `long`
+- `bullet_points` (optional): Return summary as bullet points (default: `false`)
+- `custom_prompt` (optional): Custom prompt for summarization
+
+**Success Response (200):**
+```json
+{
+  "summary": "Video summary here...",
+  "original_length": 2500,
+  "summary_length": 350,
+  "detected_language": "tr",
+  "processing_time": 4.5,
+  "model_used": "eu.mistral.pixtral-large-2502-v1:0",
+  "chunks_processed": 1,
+  "video_id": "eVGCGlBt5fo",
+  "video_url": "https://www.youtube.com/watch?v=eVGCGlBt5fo",
+  "transcript_language": "Turkish (auto-generated)",
+  "cost_estimate": {
+    "input_tokens": 3900,
+    "output_tokens": 540,
+    "input_cost_usd": 0.007800,
+    "output_cost_usd": 0.003240,
+    "total_cost_usd": 0.011040
+  }
+}
+```
+
+**Error Responses:**
+- `400`: YouTube URL is required
+- `400`: Invalid YouTube URL
+- `400`: Transcript is too short
+- `500`: Failed to fetch transcript or summarization failed
+
+**Features:**
+- Automatically fetches video transcript from YouTube
+- Supports multiple YouTube URL formats
+- Handles long transcripts with automatic chunking
+- Returns video metadata (video ID, transcript language)
+- Same powerful summarization as text endpoint
+
+**Supported YouTube URL Formats:**
+- `https://www.youtube.com/watch?v=VIDEO_ID`
+- `https://youtu.be/VIDEO_ID`
+- `https://www.youtube.com/embed/VIDEO_ID`
+- `https://www.youtube.com/v/VIDEO_ID`
+
+#### GET /api/summarize/youtube
+Health check for the YouTube summarization service.
+
+**Response:**
+```json
+{
+  "status": "healthy",
+  "service": "YouTube Video Summarization",
+  "transcript_api": "https://p5toozt7p5.execute-api.eu-central-1.amazonaws.com/dev",
+  "model_id": "eu.mistral.pixtral-large-2502-v1:0"
+}
+```
+
+---
+
 ### Test Endpoints
 
 #### GET /api/test
@@ -263,6 +343,18 @@ curl -X POST http://localhost:3000/api/summarize \
 
 # Check summarization service health
 curl http://localhost:3000/api/summarize
+
+# YouTube video summarization
+curl -X POST http://localhost:3000/api/summarize/youtube \
+  -H "Content-Type: application/json" \
+  -d '{
+    "url": "https://www.youtube.com/watch?v=eVGCGlBt5fo",
+    "summary_length": "medium",
+    "language": "tr"
+  }'
+
+# Check YouTube service health
+curl http://localhost:3000/api/summarize/youtube
 ```
 
 **Test Endpoint:**

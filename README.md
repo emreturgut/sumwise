@@ -115,11 +115,13 @@ Password: demo123
 - `GET /api/health` - Health check with database status
 - `POST /api/summarize` - AI-powered text summarization
 - `GET /api/summarize` - Summarization service health check
+- `POST /api/summarize/youtube` - YouTube video summarization
+- `GET /api/summarize/youtube` - YouTube service health check
 - `POST /api/auth/signin` - User authentication
 - `POST /api/auth/signup` - User registration
 - `GET/POST /api/test` - Test endpoints
 
-**Example Summarization Request:**
+**Example Text Summarization:**
 
 ```bash
 curl -X POST http://localhost:3000/api/summarize \
@@ -128,6 +130,17 @@ curl -X POST http://localhost:3000/api/summarize \
     "text": "Your long text here...",
     "summary_length": "medium",
     "language": "tr"
+  }'
+```
+
+**Example YouTube Video Summarization:**
+
+```bash
+curl -X POST http://localhost:3000/api/summarize/youtube \
+  -H "Content-Type: application/json" \
+  -d '{
+    "url": "https://www.youtube.com/watch?v=VIDEO_ID",
+    "summary_length": "medium"
   }'
 ```
 
