@@ -11,6 +11,12 @@ const BEDROCK_CONFIG = {
     REGION: process.env.AWS_REGION || "eu-central-1"
 }
 
+// Mistral Pixtral Large pricing (per 1K tokens)
+const PRICING = {
+    INPUT_PER_1K: 0.002,   // $0.003 per 1K input tokens
+    OUTPUT_PER_1K: 0.006   // $0.015 per 1K output tokens
+}
+
 console.log("process.env.AWS_ACCESS_KEY_ID", process.env.AWS_ACCESS_KEY_ID)
 console.log("process.env.AWS_SECRET_ACCESS_KEY", process.env.AWS_SECRET_ACCESS_KEY)
 console.log("process.env.AWS_REGION", process.env.AWS_REGION)
@@ -46,6 +52,13 @@ interface SummarizeResponse {
     processing_time: number
     model_used: string
     chunks_processed: number
+    cost_estimate: {
+        input_tokens: number
+        output_tokens: number
+        input_cost_usd: number
+        output_cost_usd: number
+        total_cost_usd: number
+    }
 }
 
 // ==================== HELPER FUNCTIONS ====================
@@ -73,6 +86,23 @@ function countTokensEstimate(text: string): number {
     const words = text.split(/\s+/).length
     // Turkish/English average: 1 word ≈ 1.3 tokens
     return Math.floor(words * 1.3)
+}
+
+/**
+ * Calculate cost based on token usage
+ */
+function calculateCost(inputTokens: number, outputTokens: number) {
+    const inputCost = (inputTokens / 1000) * PRICING.INPUT_PER_1K
+    const outputCost = (outputTokens / 1000) * PRICING.OUTPUT_PER_1K
+    const totalCost = inputCost + outputCost
+    
+    return {
+        input_tokens: inputTokens,
+        output_tokens: outputTokens,
+        input_cost_usd: Number(inputCost.toFixed(6)),
+        output_cost_usd: Number(outputCost.toFixed(6)),
+        total_cost_usd: Number(totalCost.toFixed(6))
+    }
 }
 
 /**
@@ -235,9 +265,12 @@ async function summarizeLongText(
     bulletPoints: boolean,
     language: string,
     customPrompt?: string
-): Promise<{ summary: string; chunksProcessed: number }> {
+): Promise<{ summary: string; chunksProcessed: number; inputTokens: number; outputTokens: number }> {
     const totalTokens = countTokensEstimate(text)
     console.log(`📊 Total estimated tokens: ${totalTokens}`)
+    
+    let totalInputTokens = 0
+    let totalOutputTokens = 0
     
     // If text fits in one chunk, summarize directly
     if (totalTokens < 6000) {
@@ -245,8 +278,11 @@ async function summarizeLongText(
             ? `${customPrompt}\n\nMETİN:\n${text}`
             : getSummaryPrompt(text, length, bulletPoints, language)
         
+        totalInputTokens = countTokensEstimate(prompt)
         const summary = await callBedrockMistral(prompt, 4000)
-        return { summary, chunksProcessed: 1 }
+        totalOutputTokens = countTokensEstimate(summary)
+        
+        return { summary, chunksProcessed: 1, inputTokens: totalInputTokens, outputTokens: totalOutputTokens }
     }
     
     // Long text - split into chunks
@@ -263,7 +299,9 @@ async function summarizeLongText(
             ? `${customPrompt}\n\nMETİN:\n${chunks[i]}`
             : getSummaryPrompt(chunks[i], 'medium', false, language)
         
+        totalInputTokens += countTokensEstimate(prompt)
         const chunkSummary = await callBedrockMistral(prompt, 2000)
+        totalOutputTokens += countTokensEstimate(chunkSummary)
         chunkSummaries.push(chunkSummary)
     }
     
@@ -273,9 +311,11 @@ async function summarizeLongText(
     // Final summary
     console.log(`🔄 Creating final summary from ${chunkSummaries.length} chunk summaries...`)
     const finalPrompt = getSummaryPrompt(combinedText, length, bulletPoints, language)
+    totalInputTokens += countTokensEstimate(finalPrompt)
     const finalSummary = await callBedrockMistral(finalPrompt, 4000)
+    totalOutputTokens += countTokensEstimate(finalSummary)
     
-    return { summary: finalSummary, chunksProcessed: chunks.length }
+    return { summary: finalSummary, chunksProcessed: chunks.length, inputTokens: totalInputTokens, outputTokens: totalOutputTokens }
 }
 
 // ==================== API ENDPOINT ====================
@@ -305,7 +345,7 @@ export async function POST(request: NextRequest) {
         
         // Summarize
         console.log(`🚀 Starting summarization...`)
-        const { summary, chunksProcessed } = await summarizeLongText(
+        const { summary, chunksProcessed, inputTokens, outputTokens } = await summarizeLongText(
             text,
             summaryLength,
             bulletPoints,
@@ -316,6 +356,10 @@ export async function POST(request: NextRequest) {
         const processingTime = (Date.now() - startTime) / 1000
         console.log(`✅ Summarization completed in ${processingTime.toFixed(2)}s`)
         
+        // Calculate cost
+        const costEstimate = calculateCost(inputTokens, outputTokens)
+        console.log(`💰 Estimated cost: $${costEstimate.total_cost_usd} (Input: ${inputTokens} tokens, Output: ${outputTokens} tokens)`)
+        
         // Build response
         const response: SummarizeResponse = {
             summary,
@@ -324,7 +368,8 @@ export async function POST(request: NextRequest) {
             detected_language: detectedLang,
             processing_time: Number(processingTime.toFixed(2)),
             model_used: BEDROCK_CONFIG.MODEL_ID,
-            chunks_processed: chunksProcessed
+            chunks_processed: chunksProcessed,
+            cost_estimate: costEstimate
         }
         
         return NextResponse.json(response, { status: 200 })

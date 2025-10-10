@@ -114,6 +114,13 @@ async function testSummarize(options = {}) {
         console.log(`  - Model Used: ${data.model_used}`)
         console.log(`  - Chunks Processed: ${data.chunks_processed}\n`)
         
+        console.log('💰 Cost Estimate:')
+        console.log(`  - Input Tokens: ${data.cost_estimate.input_tokens.toLocaleString()}`)
+        console.log(`  - Output Tokens: ${data.cost_estimate.output_tokens.toLocaleString()}`)
+        console.log(`  - Input Cost: $${data.cost_estimate.input_cost_usd.toFixed(6)}`)
+        console.log(`  - Output Cost: $${data.cost_estimate.output_cost_usd.toFixed(6)}`)
+        console.log(`  - Total Cost: $${data.cost_estimate.total_cost_usd.toFixed(6)}\n`)
+        
         console.log('📝 Summary:')
         console.log('─'.repeat(80))
         console.log(data.summary)

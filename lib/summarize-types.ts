@@ -47,6 +47,20 @@ export interface SummarizeResponse {
     
     /** Number of text chunks processed */
     chunks_processed: number
+    
+    /** Cost estimate for this request */
+    cost_estimate: {
+        /** Number of input tokens */
+        input_tokens: number
+        /** Number of output tokens */
+        output_tokens: number
+        /** Cost for input tokens in USD */
+        input_cost_usd: number
+        /** Cost for output tokens in USD */
+        output_cost_usd: number
+        /** Total cost in USD */
+        total_cost_usd: number
+    }
 }
 
 export interface SummarizeError {

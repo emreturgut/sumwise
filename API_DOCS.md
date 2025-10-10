@@ -138,7 +138,14 @@ Summarize text using AWS Bedrock with Mistral Pixtral Large model.
   "detected_language": "tr",
   "processing_time": 3.45,
   "model_used": "eu.mistral.pixtral-large-2502-v1:0",
-  "chunks_processed": 1
+  "chunks_processed": 1,
+  "cost_estimate": {
+    "input_tokens": 2340,
+    "output_tokens": 390,
+    "input_cost_usd": 0.007020,
+    "output_cost_usd": 0.005850,
+    "total_cost_usd": 0.012870
+  }
 }
 ```
 
