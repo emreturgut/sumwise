@@ -263,7 +263,7 @@ const SummarizeComponent: React.FC<SummarizeComponentProps> = ({ onBackToSetting
                     console.log('POPUP: Handling PDF summarization.');
                     if (embeddedPdfUrl) {
                         console.log(`POPUP: Summarizing EMBEDDED PDF from URL: ${embeddedPdfUrl}`);
-                        content = await extractPdfFromUrl(embeddedPdfUrl);
+                        content = await extractPdfFromUrl(currentUrl);
                         title = "Embedded PDF Document";
                         sourceUrl = embeddedPdfUrl;
                     } else if (isPdfUrl(currentUrl)) {
