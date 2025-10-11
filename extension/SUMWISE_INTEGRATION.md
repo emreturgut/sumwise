@@ -190,6 +190,14 @@ export async function POST(request: NextRequest) {
 4. Summarize!
 ```
 
+### Senaryo 4: YouTube Video Özetleme (Sumwise Only)
+```
+1. Sumwise API seç (YouTube için gerekli)
+2. YouTube videosuna git veya URL gir
+3. Language seç (Türkçe için optimize)
+4. Summarize! (Otomatik bullet points ile)
+```
+
 ## 🎯 Gelecek Özellikler
 
 Planlanan iyileştirmeler:

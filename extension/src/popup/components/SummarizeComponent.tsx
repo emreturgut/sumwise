@@ -286,12 +286,19 @@ const SummarizeComponent: React.FC<SummarizeComponentProps> = ({ onBackToSetting
                     if (!videoUrl || !isValidYoutubeUrl(videoUrl)) {
                         throw new Error('Please enter a valid YouTube URL or navigate to a YouTube video');
                     }
-                    const videoId = extractYoutubeVideoId(videoUrl);
-                    const transcriptContent = await getYoutubeTranscript(videoId);
-                    content = transcriptContent;
-                    title = `YouTube Video: ${videoId}`;
-                    sourceUrl = videoUrl;
-                    break;
+                    
+                    // YouTube için özel işlem - direkt endpoint'e gönder
+                    const targetLang = selectedLanguage.code === 'auto' ? pageLang : selectedLanguage.code;
+                    const effectiveCharLimit = isCharLimitOpen ? characterLimit : 0;
+                    const youtubeResult = await summarizeYouTubeVideo(videoUrl, effectiveCharLimit, targetLang);
+                    
+                    setSummary({
+                        title: youtubeResult.title,
+                        summary: youtubeResult.summary,
+                        sourceUrl: youtubeResult.sourceUrl
+                    });
+                    setIsLoading(false);
+                    return; // Early return for YouTube
             }
 
             const targetLang = selectedLanguage.code === 'auto' ? pageLang : selectedLanguage.code;
@@ -421,12 +428,84 @@ const SummarizeComponent: React.FC<SummarizeComponentProps> = ({ onBackToSetting
         return (match && match[2].length === 11) ? match[2] : '';
     };
 
-    const getYoutubeTranscript = async (videoId: string): Promise<string> => {
-        return new Promise((resolve) => {
-            setTimeout(() => {
-                resolve(`YouTube transcript extraction is a placeholder. In a real implementation, you would need a server-side API to fetch captions for video ID: ${videoId}`);
-            }, 1000);
-        });
+    const summarizeYouTubeVideo = async (
+        videoUrl: string, 
+        maxCharacters: number, 
+        targetLanguage: string
+    ): Promise<{ title: string; summary: string; sourceUrl: string }> => {
+        const result = await chrome.storage.local.get(['aiProvider', 'apiKey', 'apiUrl']);
+        const aiProvider = result.aiProvider || 'openai';
+        const apiUrl = result.apiUrl || 'http://localhost:3000';
+        
+        // Route to the correct provider
+        if (aiProvider === 'sumwise') {
+            return await summarizeYouTubeWithSumwise(videoUrl, maxCharacters, targetLanguage, apiUrl);
+        }
+        
+        // OpenAI için YouTube özetleme (eski yöntem - placeholder)
+        throw new Error('YouTube summarization with OpenAI is not yet implemented. Please use Sumwise API.');
+    };
+
+    const summarizeYouTubeWithSumwise = async (
+        videoUrl: string,
+        maxCharacters: number,
+        targetLanguage: string,
+        apiUrl: string
+    ): Promise<{ title: string; summary: string; sourceUrl: string }> => {
+        try {
+            // Prepare summary length based on character limit
+            let summaryLength: 'short' | 'medium' | 'long' = 'medium';
+            if (maxCharacters > 0) {
+                if (maxCharacters <= 300) {
+                    summaryLength = 'short';
+                } else if (maxCharacters >= 600) {
+                    summaryLength = 'long';
+                }
+            }
+
+            // Map target language
+            const language = targetLanguage === 'auto' ? undefined : targetLanguage;
+
+            // Call YouTube summarization endpoint
+            const youtubeApiUrl = `${apiUrl}/youtube`;
+            console.log('Calling YouTube Sumwise API:', youtubeApiUrl);
+            console.log('Video URL:', videoUrl);
+            console.log('Summary length:', summaryLength);
+            console.log('Language:', language);
+
+            const response = await fetch(youtubeApiUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    url: videoUrl,
+                    language: language,
+                    summary_length: summaryLength,
+                    bullet_points: true // Bullet points ile gönder
+                })
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(`Sumwise YouTube API Error: ${errorData.error || response.statusText}`);
+            }
+
+            const data = await response.json();
+            console.log('YouTube Sumwise API response:', data);
+
+            return {
+                title: `YouTube Video: ${data.video_id}`,
+                summary: data.summary,
+                sourceUrl: data.video_url
+            };
+        } catch (error) {
+            console.error('YouTube Sumwise API error:', error);
+            if (error instanceof TypeError && error.message.includes('fetch')) {
+                throw new Error('Failed to connect to Sumwise YouTube API. Make sure the server is running on ' + apiUrl);
+            }
+            throw new Error(`Failed to summarize YouTube video: ${error instanceof Error ? error.message : 'Unknown error'}`);
+        }
     };
 
     const summarizeWithSumwise = async (content: string, maxCharacters: number, targetLanguage: string, apiUrl: string): Promise<string> => {

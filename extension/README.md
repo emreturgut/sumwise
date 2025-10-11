@@ -138,11 +138,15 @@ npm run lint
 5. "Summarize" tıkla
 
 ### YouTube Özetleme
-1. YouTube videosuna git
-2. Extension icon'una tıkla
-3. Video URL'i otomatik algılanır
-4. Language seç
-5. "Summarize" tıkla
+1. **Sumwise API seçili olmalı** (OpenAI YouTube desteklemiyor)
+2. YouTube videosuna git veya URL gir
+3. Extension icon'una tıkla
+4. Video otomatik algılanır
+5. Language seç
+6. "Summarize" tıkla
+7. Otomatik olarak bullet points ile özet oluşturulur
+
+**Not:** YouTube özetleme özelliği sadece Sumwise API ile çalışır.
 
 ---
 
