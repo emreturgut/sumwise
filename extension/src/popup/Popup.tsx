@@ -35,15 +35,33 @@ const Popup: React.FC = () => {
     };
 
     return (
-        <div className="popup-container">
-            {(showSettings || !hasApiKey) ? (
-                <AISelectionForm onSaved={handleApiKeySaved} />
-            ) : (
-                <SummarizeComponent
-                    onBackToSettings={handleBackToSettings}
-                    selectedModel={selectedModel}
-                />
-            )}
+        <div className="popup-root">
+            <div className="header-bar">
+                <div className="brand">
+                    <span className="brand-name">Sumwise</span>
+                </div>
+                <div className="header-actions">
+                    {(showSettings || !hasApiKey) ? (
+                        <button className="ghost-button" onClick={() => setShowSettings(false)}>
+                            Summarize
+                        </button>
+                    ) : (
+                        <button className="ghost-button" onClick={handleBackToSettings}>
+                            Settings
+                        </button>
+                    )}
+                </div>
+            </div>
+            <div className="popup-container">
+                {(showSettings || !hasApiKey) ? (
+                    <AISelectionForm onSaved={handleApiKeySaved} />
+                ) : (
+                    <SummarizeComponent
+                        onBackToSettings={handleBackToSettings}
+                        selectedModel={selectedModel}
+                    />
+                )}
+            </div>
         </div>
     );
 };
