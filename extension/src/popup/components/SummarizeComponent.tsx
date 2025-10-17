@@ -684,13 +684,23 @@ const SummarizeComponent: React.FC<SummarizeComponentProps> = () => {
                 </div>
             )}
 
+            {isLoading && (
+                <div className="loading-container">
+                    <div className="loader">
+                        <div className="loader-spinner"></div>
+                    </div>
+                    <p className="loading-text">Summarizing content...</p>
+                    <p className="loading-subtext">This may take a few moments</p>
+                </div>
+            )}
+
             {error && (
                 <div className="error-message">
                     {error}
                 </div>
             )}
 
-            {summary && (
+            {summary && !isLoading && (
                 <div className="summary-result">
                     <h3 className="summary-title">{summary.title}</h3>
                     {summary.sourceUrl && (
