@@ -94,6 +94,7 @@ const SummarizeComponent: React.FC<SummarizeComponentProps> = () => {
     const [selectedLanguage, setSelectedLanguage] = useState(LANGUAGES[0]);
     const [isLanguageDropdownOpen, setIsLanguageDropdownOpen] = useState(false);
     const [autoDetectContent, setAutoDetectContent] = useState(true);
+    const [isSettingsVisible, setIsSettingsVisible] = useState(true);
 
     useEffect(() => {
         getCurrentTab();
@@ -219,6 +220,7 @@ const SummarizeComponent: React.FC<SummarizeComponentProps> = () => {
         setIsLoading(true);
         setError('');
         setSummary(null);
+        setIsSettingsVisible(false); // Ayarları gizle
         console.log(`POPUP: handleSummarize triggered. ContentType: ${contentType}, EmbeddedPDF URL: ${embeddedPdfUrl}, CurrentURL: ${currentUrl}`);
 
         try {
@@ -545,7 +547,17 @@ const SummarizeComponent: React.FC<SummarizeComponentProps> = () => {
 
     return (
         <div className="summarize-component">
-            <div className="content-type-selection">
+            <div 
+                className={`settings-header ${isSettingsVisible ? 'open' : ''}`}
+                onClick={() => setIsSettingsVisible(!isSettingsVisible)}
+            >
+                <span className="settings-header-title">Settings</span>
+                <span className="settings-header-icon"></span>
+            </div>
+
+            {isSettingsVisible && (
+                <div className="settings-content">
+                    <div className="content-type-selection">
                 <label htmlFor="content-type">Content Type:</label>
                 <div className="content-type-value">
                     {getContentTypeLabel()}
@@ -660,15 +672,17 @@ const SummarizeComponent: React.FC<SummarizeComponentProps> = () => {
                 )}
             </div>
 
-            <div className="summarize-container">
-                <button
-                    className="summarize-button"
-                    onClick={handleSummarize}
-                    disabled={isLoading || (!autoDetectContent && contentType === 'pdf' && !pdfFile) || (!autoDetectContent && contentType === 'youtube' && !youtubeUrl)}
-                >
-                    {isLoading ? 'Processing...' : 'Summarize'}
-                </button>
-            </div>
+                    <div className="summarize-container">
+                        <button
+                            className="summarize-button"
+                            onClick={handleSummarize}
+                            disabled={isLoading || (!autoDetectContent && contentType === 'pdf' && !pdfFile) || (!autoDetectContent && contentType === 'youtube' && !youtubeUrl)}
+                        >
+                            {isLoading ? 'Processing...' : 'Summarize'}
+                        </button>
+                    </div>
+                </div>
+            )}
 
             {error && (
                 <div className="error-message">
