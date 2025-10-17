@@ -13,10 +13,7 @@ if (typeof window !== 'undefined' && typeof Worker !== 'undefined') {
     console.warn('POPUP: Worker type is undefined, PDF.js might run on main thread or fail.');
 }
 
-interface SummarizeComponentProps {
-    onBackToSettings: () => void;
-    selectedModel: string;
-}
+interface SummarizeComponentProps {}
 
 type ContentType = 'webpage' | 'pdf' | 'youtube';
 
@@ -83,10 +80,8 @@ function extractTextFromStructNode(node: any): string {
     return text;
 }
 
-const SummarizeComponent: React.FC<SummarizeComponentProps> = ({ onBackToSettings, selectedModel: initialModel }) => {
+const SummarizeComponent: React.FC<SummarizeComponentProps> = () => {
     const [isLoading, setIsLoading] = useState(false);
-    const [selectedModel, setSelectedModel] = useState(initialModel || 'o4-mini');
-    const [aiProvider, setAiProvider] = useState('openai');
     const [contentType, setContentType] = useState<ContentType>('webpage');
     const [pdfFile, setPdfFile] = useState<File | null>(null);
     const [youtubeUrl, setYoutubeUrl] = useState('');
@@ -102,12 +97,6 @@ const SummarizeComponent: React.FC<SummarizeComponentProps> = ({ onBackToSetting
 
     useEffect(() => {
         getCurrentTab();
-        // Load AI provider
-        chrome.storage.local.get(['aiProvider'], (result) => {
-            if (result.aiProvider) {
-                setAiProvider(result.aiProvider);
-            }
-        });
     }, []);
 
     const getCurrentTab = async () => {
@@ -195,18 +184,6 @@ const SummarizeComponent: React.FC<SummarizeComponentProps> = ({ onBackToSetting
         return /^(https?:\/\/)?(www\.)?(youtube\.com\/watch|youtu\.be\/)/i.test(url);
     };
 
-    useEffect(() => {
-        setSelectedModel(initialModel);
-    }, [initialModel]);
-
-    const handleModelChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        const newModel = e.target.value;
-        setSelectedModel(newModel);
-
-        chrome.storage.local.set({ model: newModel }, () => {
-            console.log('Model saved:', newModel);
-        });
-    };
 
     const handleContentTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         setContentType(e.target.value as ContentType);
@@ -433,17 +410,8 @@ const SummarizeComponent: React.FC<SummarizeComponentProps> = ({ onBackToSetting
         maxCharacters: number, 
         targetLanguage: string
     ): Promise<{ title: string; summary: string; sourceUrl: string }> => {
-        const result = await chrome.storage.local.get(['aiProvider', 'apiKey', 'apiUrl']);
-        const aiProvider = result.aiProvider || 'openai';
-        const apiUrl = result.apiUrl || 'http://localhost:3000';
-        
-        // Route to the correct provider
-        if (aiProvider === 'sumwise') {
-            return await summarizeYouTubeWithSumwise(videoUrl, maxCharacters, targetLanguage, apiUrl);
-        }
-        
-        // OpenAI için YouTube özetleme (eski yöntem - placeholder)
-        throw new Error('YouTube summarization with OpenAI is not yet implemented. Please use Sumwise API.');
+        const apiUrl = 'http://localhost:3000';
+        return await summarizeYouTubeWithSumwise(videoUrl, maxCharacters, targetLanguage, apiUrl);
     };
 
     const summarizeYouTubeWithSumwise = async (
@@ -560,81 +528,8 @@ const SummarizeComponent: React.FC<SummarizeComponentProps> = ({ onBackToSetting
     };
 
     const summarizeWithAI = async (content: string, maxCharacters: number, targetLanguage: string): Promise<string> => {
-        const result = await chrome.storage.local.get(['aiProvider', 'apiKey', 'apiUrl']);
-        const aiProvider = result.aiProvider || 'openai';
-        const apiKey = result.apiKey;
-        const apiUrl = result.apiUrl || 'http://localhost:3000/api/summarize';
-
-        // Route to the correct provider
-        if (aiProvider === 'sumwise') {
-            return await summarizeWithSumwise(content, maxCharacters, targetLanguage, apiUrl);
-        }
-
-        // Default to OpenAI
-        if (!apiKey) {
-            throw new Error('API key not found. Please set it in the settings.');
-        }
-
-        const maxContentLength = 4000;
-        const truncatedContent = content.length > maxContentLength
-            ? content.substring(0, maxContentLength) + '...'
-            : content;
-
-        try {
-            let systemMessage = "Create a concise summary of the content highlighting the main ideas and key points.";
-
-            if (targetLanguage !== 'auto' && targetLanguage !== 'en') {
-                const languageNames: { [key: string]: string } = {
-                    'tr': 'Turkish',
-                    'ar': 'Arabic',
-                    'de': 'German',
-                    'fr': 'French',
-                    'it': 'Italian'
-                };
-
-                const languageName = languageNames[targetLanguage] || targetLanguage;
-                systemMessage += ` Provide the summary in ${languageName}.`;
-            }
-
-            if (maxCharacters > 0) {
-                systemMessage += ` Limit the summary to maximum ${maxCharacters} characters.`;
-            }
-
-            const response = await fetch('https://api.openai.com/v1/chat/completions', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${apiKey}`
-                },
-                body: JSON.stringify({
-                    model: selectedModel,
-                    messages: [
-                        {
-                            role: "system",
-                            content: systemMessage
-                        },
-                        {
-                            role: "user",
-                            content: `Summarize this content: ${truncatedContent}`
-                        }
-                    ],
-                    max_tokens: 500
-                })
-            });
-
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(`API Error: ${errorData.error?.message || response.statusText}`);
-            }
-
-            const data = await response.json();
-            const summaryText = data.choices[0].message.content;
-
-            return summaryText;
-        } catch (error) {
-            console.error('AI summarization error:', error);
-            throw new Error('Failed to generate summary. Please check your API key and try again.');
-        }
+        const apiUrl = 'http://localhost:3000/api/summarize';
+        return await summarizeWithSumwise(content, maxCharacters, targetLanguage, apiUrl);
     };
 
     const getContentTypeLabel = () => {
@@ -650,42 +545,6 @@ const SummarizeComponent: React.FC<SummarizeComponentProps> = ({ onBackToSetting
 
     return (
         <div className="summarize-component">
-            <header className="header">
-                <h2>AI Summarizer</h2>
-                <button className="settings-button" onClick={onBackToSettings}>
-                    Settings
-                </button>
-            </header>
-
-            <div className="provider-info" style={{ 
-                padding: '10px', 
-                background: aiProvider === 'sumwise' ? '#e8f5e9' : '#e3f2fd', 
-                borderRadius: '5px', 
-                marginBottom: '15px',
-                fontSize: '13px'
-            }}>
-                <strong>Provider:</strong> {aiProvider === 'sumwise' ? '🚀 Sumwise API (AWS Bedrock + Mistral)' : '🤖 OpenAI'}
-            </div>
-
-            {aiProvider === 'openai' && (
-                <div className="model-selection">
-                    <label htmlFor="model-select">Model:</label>
-                    <select
-                        id="model-select"
-                        value={selectedModel}
-                        onChange={handleModelChange}
-                        className="model-select"
-                    >
-                        <option value="gpt-4.1">GPT-4.1</option>
-                        <option value="o4-mini">O4 Mini</option>
-                        <option value="o3">O3</option>
-                        <option value="gpt-4o">GPT-4o</option>
-                        <option value="gpt-4o-mini">GPT-4o Mini</option>
-                        <option value="gpt-4-turbo">GPT-4 Turbo</option>
-                    </select>
-                </div>
-            )}
-
             <div className="content-type-selection">
                 <label htmlFor="content-type">Content Type:</label>
                 <div className="content-type-value">
